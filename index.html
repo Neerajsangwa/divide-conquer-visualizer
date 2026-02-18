@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divide & Conquer Algorithm Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .section h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .algo-description {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            font-style: italic;
+            color: #555;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .results {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .result-item h3 {
+            color: #28a745;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .result-value {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            word-wrap: break-word;
+        }
+
+        .complexity {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .complexity-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .complexity-item strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .visualization {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            min-height: 200px;
+            border: 2px dashed #e0e0e0;
+        }
+
+        .step {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            animation: highlightStep 0.3s ease;
+        }
+
+        @keyframes highlightStep {
+            from {
+                background: #ffeaa7;
+            }
+            to {
+                background: #f8f9fa;
+            }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #28a745;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .example-text {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .complexity {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .array-visual {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .array-item {
+            background: #667eea;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            animation: pop 0.3s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .matrix-display {
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .matrix-row {
+            display: flex;
+            gap: 5px;
+        }
+
+        .matrix-cell {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            min-width: 60px;
+            text-align: center;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .highlight {
+            background: #ffeaa7 !important;
+            color: #333 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Divide & Conquer Visualizer</h1>
+        <p class="subtitle">Interactive visualization of divide and conquer algorithms with time complexity analysis</p>
+
+        <!-- Algorithm Selection -->
+        <div class="section">
+            <h2>📊 Select Algorithm</h2>
+            <label for="algorithmSelect">Choose an algorithm:</label>
+            <select id="algorithmSelect">
+                <option value="">-- Select an Algorithm --</option>
+                <option value="mergeSort">Merge Sort</option>
+                <option value="quickSort">Quick Sort</option>
+                <option value="binarySearch">Binary Search</option>
+                <option value="heapSort">Heap Sort</option>
+                <option value="fastPower">Fast Power (Exponentiation)</option>
+                <option value="insertionSort">Insertion Sort</option>
+                <option value="minMax">Min-Max (Divide & Conquer)</option>
+                <option value="strassen">Strassen Matrix Multiplication (2×2)</option>
+            </select>
+
+            <div id="algoDescription" class="algo-description" style="display: none;"></div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="section" id="inputSection" style="display: none;">
+            <h2>📝 Input Data</h2>
+            <div id="inputFields"></div>
+            <button id="runButton" onclick="runAlgorithm()">🚀 Run Algorithm</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="section results" id="resultsSection">
+            <h2>✨ Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+
+        <!-- Visualization Section -->
+        <div class="section results" id="visualizationSection">
+            <h2>🎯 Step-by-Step Execution</h2>
+            <div id="visualizationContent" class="visualization"></div>
+        </div>
+
+        <!-- Complexity Analysis -->
+        <div class="section results" id="complexitySection">
+            <h2>📈 Complexity Analysis</h2>
+            <div id="complexityContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Algorithm descriptions and metadata
+        const algorithms = {
+            mergeSort: {
+                name: "Merge Sort",
+                description: "A divide-and-conquer sorting algorithm that divides the array into two halves, sorts them recursively, and merges the sorted halves.",
+                timeComplexity: { best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)" },
+                spaceComplexity: "O(n)",
+                inputType: "array"
+            },
+            quickSort: {
+                name: "Quick Sort",
+                description: "A divide-and-conquer sorting algorithm that picks a pivot element and partitions the array around it, then recursively sorts the sub-arrays.",
+                timeComplexity: { best: "O(n log n)", average: "O(n log n)", worst: "O(n²)" },
+                spaceComplexity: "O(log n)",
+                inputType: "array"
+            },
+            binarySearch: {
+                name: "Binary Search",
+                description: "A divide-and-conquer search algorithm that finds the position of a target value in a sorted array by repeatedly dividing the search interval in half.",
+                timeComplexity: { best: "O(1)", average: "O(log n)", worst: "O(log n)" },
+                spaceComplexity: "O(1)",
+                inputType: "arrayAndTarget"
+            },
+            heapSort: {
+                name: "Heap Sort",
+                description: "A comparison-based sorting algorithm that uses a binary heap data structure. It builds a max heap and repeatedly extracts the maximum element.",
+                timeComplexity: { best: "O(n log n)", average: "O(n log n)", worst: "O(n log n)" },
+                spaceComplexity: "O(1)",
+                inputType: "array"
+            },
+            fastPower: {
+                name: "Fast Power (Exponentiation)",
+                description: "A divide-and-conquer algorithm to calculate x^n efficiently by recursively squaring and halving the exponent.",
+                timeComplexity: { best: "O(log n)", average: "O(log n)", worst: "O(log n)" },
+                spaceComplexity: "O(log n)",
+                inputType: "power"
+            },
+            insertionSort: {
+                name: "Insertion Sort",
+                description: "A simple sorting algorithm that builds the final sorted array one item at a time by inserting each element into its correct position.",
+                timeComplexity: { best: "O(n)", average: "O(n²)", worst: "O(n²)" },
+                spaceComplexity: "O(1)",
+                inputType: "array"
+            },
+            minMax: {
+                name: "Min-Max (Divide & Conquer)",
+                description: "A divide-and-conquer algorithm to find both minimum and maximum elements in an array by dividing it into two halves.",
+                timeComplexity: { best: "O(n)", average: "O(n)", worst: "O(n)" },
+                spaceComplexity: "O(log n)",
+                inputType: "array"
+            },
+            strassen: {
+                name: "Strassen Matrix Multiplication",
+                description: "An efficient divide-and-conquer algorithm for matrix multiplication that uses 7 multiplications instead of 8 for 2×2 matrices.",
+                timeComplexity: { best: "O(n^2.807)", average: "O(n^2.807)", worst: "O(n^2.807)" },
+                spaceComplexity: "O(n²)",
+                inputType: "matrices"
+            }
+        };
+
+        let steps = [];
+        let operationCount = 0;
+
+        // Handle algorithm selection
+        document.getElementById('algorithmSelect').addEventListener('change', function() {
+            const selected = this.value;
+            if (selected) {
+                showInputFields(selected);
+                showDescription(selected);
+            } else {
+                hideAllSections();
+            }
+        });
+
+        function showDescription(algo) {
+            const description = document.getElementById('algoDescription');
+            const algoData = algorithms[algo];
+            description.innerHTML = `<strong>${algoData.name}:</strong> ${algoData.description}`;
+            description.style.display = 'block';
+        }
+
+        function showInputFields(algo) {
+            const inputSection = document.getElementById('inputSection');
+            const inputFields = document.getElementById('inputFields');
+            inputSection.style.display = 'block';
+
+            const algoData = algorithms[algo];
+            inputFields.innerHTML = '';
+
+            switch(algoData.inputType) {
+                case 'array':
+                    inputFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="arrayInput">Enter array elements (comma-separated):</label>
+                            <input type="text" id="arrayInput" placeholder="e.g., 64, 34, 25, 12, 22, 11, 90">
+                            <p class="example-text">Example: 64, 34, 25, 12, 22, 11, 90</p>
+                        </div>
+                    `;
+                    break;
+                case 'arrayAndTarget':
+                    inputFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="arrayInput">Enter sorted array elements (comma-separated):</label>
+                            <input type="text" id="arrayInput" placeholder="e.g., 2, 5, 8, 12, 16, 23, 38, 45, 56, 67, 78">
+                            <p class="example-text">Example: 2, 5, 8, 12, 16, 23, 38, 45, 56, 67, 78</p>
+                        </div>
+                        <div class="input-group">
+                            <label for="targetInput">Enter target value to search:</label>
+                            <input type="number" id="targetInput" placeholder="e.g., 23">
+                        </div>
+                    `;
+                    break;
+                case 'power':
+                    inputFields.innerHTML = `
+                        <div class="input-group">
+                            <label for="baseInput">Enter base (x):</label>
+                            <input type="number" id="baseInput" placeholder="e.g., 2" value="2">
+                        </div>
+                        <div class="input-group">
+                            <label for="exponentInput">Enter exponent (n):</label>
+                            <input type="number" id="exponentInput" placeholder="e.g., 10" value="10">
+                        </div>
+                    `;
+                    break;
+                case 'matrices':
+                    inputFields.innerHTML = `
+                        <div class="input-group">
+                            <label>Matrix A (2×2):</label>
+                            <input type="text" id="matrixA" placeholder="e.g., 1,2,3,4 (row-wise)">
+                            <p class="example-text">Enter 4 numbers comma-separated: 1,2,3,4 represents [[1,2],[3,4]]</p>
+                        </div>
+                        <div class="input-group">
+                            <label>Matrix B (2×2):</label>
+                            <input type="text" id="matrixB" placeholder="e.g., 5,6,7,8 (row-wise)">
+                            <p class="example-text">Enter 4 numbers comma-separated: 5,6,7,8 represents [[5,6],[7,8]]</p>
+                        </div>
+                    `;
+                    break;
+            }
+
+            // Hide results when changing algorithm
+            hideResults();
+        }
+
+        function hideAllSections() {
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('algoDescription').style.display = 'none';
+            hideResults();
+        }
+
+        function hideResults() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('visualizationSection').style.display = 'none';
+            document.getElementById('complexitySection').style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('visualizationSection').style.display = 'block';
+            document.getElementById('complexitySection').style.display = 'block';
+        }
+
+        function parseArray(input) {
+            return input.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+        }
+
+        function parseMatrix(input) {
+            const nums = parseArray(input);
+            if (nums.length !== 4) {
+                throw new Error("Matrix must have exactly 4 elements");
+            }
+            return [[nums[0], nums[1]], [nums[2], nums[3]]];
+        }
+
+        function runAlgorithm() {
+            try {
+                steps = [];
+                operationCount = 0;
+                const selected = document.getElementById('algorithmSelect').value;
+                
+                if (!selected) {
+                    showError("Please select an algorithm first!");
+                    return;
+                }
+
+                const button = document.getElementById('runButton');
+                button.disabled = true;
+                button.innerHTML = '<span class="loading"></span> Running...';
+
+                setTimeout(() => {
+                    try {
+                        let result;
+                        const startTime = performance.now();
+
+                        switch(selected) {
+                            case 'mergeSort':
+                                result = runMergeSort();
+                                break;
+                            case 'quickSort':
+                                result = runQuickSort();
+                                break;
+                            case 'binarySearch':
+                                result = runBinarySearch();
+                                break;
+                            case 'heapSort':
+                                result = runHeapSort();
+                                break;
+                            case 'fastPower':
+                                result = runFastPower();
+                                break;
+                            case 'insertionSort':
+                                result = runInsertionSort();
+                                break;
+                            case 'minMax':
+                                result = runMinMax();
+                                break;
+                            case 'strassen':
+                                result = runStrassen();
+                                break;
+                        }
+
+                        const endTime = performance.now();
+                        const executionTime = (endTime - startTime).toFixed(4);
+
+                        displayResults(selected, result, executionTime);
+                        displayVisualization();
+                        displayComplexity(selected);
+
+                    } catch (error) {
+                        showError(error.message);
+                    } finally {
+                        button.disabled = false;
+                        button.innerHTML = '🚀 Run Algorithm';
+                    }
+                }, 100);
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Merge Sort Implementation
+        function runMergeSort() {
+            const input = document.getElementById('arrayInput').value;
+            if (!input.trim()) throw new Error("Please enter an array!");
+            
+            const arr = parseArray(input);
+            if (arr.length === 0) throw new Error("Please enter valid numbers!");
+            
+            steps.push(`Initial array: [${arr.join(', ')}]`);
+            const sorted = mergeSort(arr.slice(), 0, arr.length - 1);
+            steps.push(`Final sorted array: [${sorted.join(', ')}]`);
+            
+            return { input: arr, output: sorted };
+        }
+
+        function mergeSort(arr, left, right) {
+            if (left >= right) return arr.slice(left, right + 1);
+            
+            const mid = Math.floor((left + right) / 2);
+            steps.push(`Dividing array from index ${left} to ${right}, mid: ${mid}`);
+            
+            mergeSort(arr, left, mid);
+            mergeSort(arr, mid + 1, right);
+            merge(arr, left, mid, right);
+            
+            return arr;
+        }
+
+        function merge(arr, left, mid, right) {
+            const leftArr = arr.slice(left, mid + 1);
+            const rightArr = arr.slice(mid + 1, right + 1);
+            
+            steps.push(`Merging [${leftArr.join(', ')}] and [${rightArr.join(', ')}]`);
+            
+            let i = 0, j = 0, k = left;
+            
+            while (i < leftArr.length && j < rightArr.length) {
+                operationCount++;
+                if (leftArr[i] <= rightArr[j]) {
+                    arr[k++] = leftArr[i++];
+                } else {
+                    arr[k++] = rightArr[j++];
+                }
+            }
+            
+            while (i < leftArr.length) arr[k++] = leftArr[i++];
+            while (j < rightArr.length) arr[k++] = rightArr[j++];
+            
+            steps.push(`Merged result: [${arr.slice(left, right + 1).join(', ')}]`);
+        }
+
+        // Quick Sort Implementation
+        function runQuickSort() {
+            const input = document.getElementById('arrayInput').value;
+            if (!input.trim()) throw new Error("Please enter an array!");
+            
+            const arr = parseArray(input);
+            if (arr.length === 0) throw new Error("Please enter valid numbers!");
+            
+            steps.push(`Initial array: [${arr.join(', ')}]`);
+            quickSort(arr, 0, arr.length - 1);
+            steps.push(`Final sorted array: [${arr.join(', ')}]`);
+            
+            return { input: parseArray(input), output: arr };
+        }
+
+        function quickSort(arr, low, high) {
+            if (low < high) {
+                const pi = partition(arr, low, high);
+                steps.push(`Pivot placed at index ${pi}, value: ${arr[pi]}`);
+                quickSort(arr, low, pi - 1);
+                quickSort(arr, pi + 1, high);
+            }
+        }
+
+        function partition(arr, low, high) {
+            const pivot = arr[high];
+            steps.push(`Partitioning with pivot: ${pivot}`);
+            let i = low - 1;
+            
+            for (let j = low; j < high; j++) {
+                operationCount++;
+                if (arr[j] < pivot) {
+                    i++;
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+            }
+            
+            [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+            return i + 1;
+        }
+
+        // Binary Search Implementation
+        function runBinarySearch() {
+            const arrayInput = document.getElementById('arrayInput').value;
+            const targetInput = document.getElementById('targetInput').value;
+            
+            if (!arrayInput.trim()) throw new Error("Please enter an array!");
+            if (!targetInput.trim()) throw new Error("Please enter a target value!");
+            
+            const arr = parseArray(arrayInput);
+            const target = parseFloat(targetInput);
+            
+            if (arr.length === 0) throw new Error("Please enter valid numbers!");
+            if (isNaN(target)) throw new Error("Please enter a valid target number!");
+            
+            steps.push(`Searching for ${target} in array: [${arr.join(', ')}]`);
+            const index = binarySearch(arr, target, 0, arr.length - 1);
+            
+            if (index !== -1) {
+                steps.push(`✓ Found ${target} at index ${index}`);
+            } else {
+                steps.push(`✗ ${target} not found in the array`);
+            }
+            
+            return { input: arr, target: target, index: index };
+        }
+
+        function binarySearch(arr, target, left, right) {
+            if (left > right) return -1;
+            
+            const mid = Math.floor((left + right) / 2);
+            operationCount++;
+            steps.push(`Checking middle element at index ${mid}: ${arr[mid]} (range: ${left}-${right})`);
+            
+            if (arr[mid] === target) return mid;
+            
+            if (arr[mid] > target) {
+                steps.push(`${target} < ${arr[mid]}, searching left half`);
+                return binarySearch(arr, target, left, mid - 1);
+            } else {
+                steps.push(`${target} > ${arr[mid]}, searching right half`);
+                return binarySearch(arr, target, mid + 1, right);
+            }
+        }
+
+        // Heap Sort Implementation
+        function runHeapSort() {
+            const input = document.getElementById('arrayInput').value;
+            if (!input.trim()) throw new Error("Please enter an array!");
+            
+            const arr = parseArray(input);
+            if (arr.length === 0) throw new Error("Please enter valid numbers!");
+            
+            steps.push(`Initial array: [${arr.join(', ')}]`);
+            heapSort(arr);
+            steps.push(`Final sorted array: [${arr.join(', ')}]`);
+            
+            return { input: parseArray(input), output: arr };
+        }
+
+        function heapSort(arr) {
+            const n = arr.length;
+            
+            steps.push('Building max heap...');
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                heapify(arr, n, i);
+            }
+            
+            steps.push('Extracting elements from heap...');
+            for (let i = n - 1; i > 0; i--) {
+                [arr[0], arr[i]] = [arr[i], arr[0]];
+                steps.push(`Swapped root ${arr[i]} to position ${i}`);
+                heapify(arr, i, 0);
+            }
+        }
+
+        function heapify(arr, n, i) {
+            let largest = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+            
+            operationCount++;
+            if (left < n && arr[left] > arr[largest]) largest = left;
+            if (right < n && arr[right] > arr[largest]) largest = right;
+            
+            if (largest !== i) {
+                [arr[i], arr[largest]] = [arr[largest], arr[i]];
+                heapify(arr, n, largest);
+            }
+        }
+
+        // Fast Power Implementation
+        function runFastPower() {
+            const base = parseFloat(document.getElementById('baseInput').value);
+            const exponent = parseInt(document.getElementById('exponentInput').value);
+            
+            if (isNaN(base)) throw new Error("Please enter a valid base!");
+            if (isNaN(exponent)) throw new Error("Please enter a valid exponent!");
+            
+            steps.push(`Calculating ${base}^${exponent} using fast exponentiation`);
+            const result = fastPower(base, exponent);
+            steps.push(`Result: ${base}^${exponent} = ${result}`);
+            
+            return { base: base, exponent: exponent, result: result };
+        }
+
+        function fastPower(x, n) {
+            if (n === 0) {
+                steps.push(`${x}^0 = 1`);
+                return 1;
+            }
+            if (n === 1) {
+                steps.push(`${x}^1 = ${x}`);
+                return x;
+            }
+            
+            operationCount++;
+            if (n % 2 === 0) {
+                steps.push(`${x}^${n} = (${x}^${n/2})² (even exponent)`);
+                const half = fastPower(x, n / 2);
+                return half * half;
+            } else {
+                steps.push(`${x}^${n} = ${x} × (${x}^${Math.floor(n/2)})² (odd exponent)`);
+                const half = fastPower(x, Math.floor(n / 2));
+                return x * half * half;
+            }
+        }
+
+        // Insertion Sort Implementation
+        function runInsertionSort() {
+            const input = document.getElementById('arrayInput').value;
+            if (!input.trim()) throw new Error("Please enter an array!");
+            
+            const arr = parseArray(input);
+            if (arr.length === 0) throw new Error("Please enter valid numbers!");
+            
+            steps.push(`Initial array: [${arr.join(', ')}]`);
+            insertionSort(arr);
+            steps.push(`Final sorted array: [${arr.join(', ')}]`);
+            
+            return { input: parseArray(input), output: arr };
+        }
+
+        function insertionSort(arr) {
+            for (let i = 1; i < arr.length; i++) {
+                const key = arr[i];
+                let j = i - 1;
+                
+                steps.push(`Inserting ${key} into sorted portion [${arr.slice(0, i).join(', ')}]`);
+                
+                while (j >= 0 && arr[j] > key) {
+                    operationCount++;
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                
+                arr[j + 1] = key;
+                steps.push(`Array after insertion: [${arr.join(', ')}]`);
+            }
+        }
+
+        // Min-Max Divide & Conquer Implementation
+        function runMinMax() {
+            const input = document.getElementById('arrayInput').value;
+            if (!input.trim()) throw new Error("Please enter an array!");
+            
+            const arr = parseArray(input);
+            if (arr.length === 0) throw new Error("Please enter valid numbers!");
+            
+            steps.push(`Finding min and max in array: [${arr.join(', ')}]`);
+            const result = findMinMax(arr, 0, arr.length - 1);
+            steps.push(`Minimum: ${result.min}, Maximum: ${result.max}`);
+            
+            return { input: arr, min: result.min, max: result.max };
+        }
+
+        function findMinMax(arr, low, high) {
+            if (low === high) {
+                steps.push(`Single element at index ${low}: ${arr[low]}`);
+                return { min: arr[low], max: arr[low] };
+            }
+            
+            if (high === low + 1) {
+                operationCount++;
+                steps.push(`Comparing two elements: ${arr[low]} and ${arr[high]}`);
+                if (arr[low] < arr[high]) {
+                    return { min: arr[low], max: arr[high] };
+                } else {
+                    return { min: arr[high], max: arr[low] };
+                }
+            }
+            
+            const mid = Math.floor((low + high) / 2);
+            steps.push(`Dividing array at index ${mid}`);
+            
+            const leftResult = findMinMax(arr, low, mid);
+            const rightResult = findMinMax(arr, mid + 1, high);
+            
+            operationCount += 2;
+            const finalMin = Math.min(leftResult.min, rightResult.min);
+            const finalMax = Math.max(leftResult.max, rightResult.max);
+            
+            steps.push(`Merging results: min(${leftResult.min}, ${rightResult.min}) = ${finalMin}, max(${leftResult.max}, ${rightResult.max}) = ${finalMax}`);
+            
+            return { min: finalMin, max: finalMax };
+        }
+
+        // Strassen Matrix Multiplication Implementation
+        function runStrassen() {
+            const inputA = document.getElementById('matrixA').value;
+            const inputB = document.getElementById('matrixB').value;
+            
+            if (!inputA.trim() || !inputB.trim()) {
+                throw new Error("Please enter both matrices!");
+            }
+            
+            const matrixA = parseMatrix(inputA);
+            const matrixB = parseMatrix(inputB);
+            
+            steps.push('Matrix A:');
+            steps.push(`  [${matrixA[0].join(', ')}]`);
+            steps.push(`  [${matrixA[1].join(', ')}]`);
+            steps.push('Matrix B:');
+            steps.push(`  [${matrixB[0].join(', ')}]`);
+            steps.push(`  [${matrixB[1].join(', ')}]`);
+            
+            const result = strassenMultiply(matrixA, matrixB);
+            
+            steps.push('Result Matrix:');
+            steps.push(`  [${result[0].join(', ')}]`);
+            steps.push(`  [${result[1].join(', ')}]`);
+            
+            return { matrixA: matrixA, matrixB: matrixB, result: result };
+        }
+
+        function strassenMultiply(A, B) {
+            const a11 = A[0][0], a12 = A[0][1];
+            const a21 = A[1][0], a22 = A[1][1];
+            const b11 = B[0][0], b12 = B[0][1];
+            const b21 = B[1][0], b22 = B[1][1];
+            
+            steps.push('Computing Strassen\'s 7 products:');
+            
+            operationCount++;
+            const M1 = (a11 + a22) * (b11 + b22);
+            steps.push(`M1 = (a11 + a22) × (b11 + b22) = (${a11} + ${a22}) × (${b11} + ${b22}) = ${M1}`);
+            
+            operationCount++;
+            const M2 = (a21 + a22) * b11;
+            steps.push(`M2 = (a21 + a22) × b11 = (${a21} + ${a22}) × ${b11} = ${M2}`);
+            
+            operationCount++;
+            const M3 = a11 * (b12 - b22);
+            steps.push(`M3 = a11 × (b12 - b22) = ${a11} × (${b12} - ${b22}) = ${M3}`);
+            
+            operationCount++;
+            const M4 = a22 * (b21 - b11);
+            steps.push(`M4 = a22 × (b21 - b11) = ${a22} × (${b21} - ${b11}) = ${M4}`);
+            
+            operationCount++;
+            const M5 = (a11 + a12) * b22;
+            steps.push(`M5 = (a11 + a12) × b22 = (${a11} + ${a12}) × ${b22} = ${M5}`);
+            
+            operationCount++;
+            const M6 = (a21 - a11) * (b11 + b12);
+            steps.push(`M6 = (a21 - a11) × (b11 + b12) = (${a21} - ${a11}) × (${b11} + ${b12}) = ${M6}`);
+            
+            operationCount++;
+            const M7 = (a12 - a22) * (b21 + b22);
+            steps.push(`M7 = (a12 - a22) × (b21 + b22) = (${a12} - ${a22}) × (${b21} + ${b22}) = ${M7}`);
+            
+            steps.push('Computing result matrix elements:');
+            
+            const c11 = M1 + M4 - M5 + M7;
+            steps.push(`C11 = M1 + M4 - M5 + M7 = ${c11}`);
+            
+            const c12 = M3 + M5;
+            steps.push(`C12 = M3 + M5 = ${c12}`);
+            
+            const c21 = M2 + M4;
+            steps.push(`C21 = M2 + M4 = ${c21}`);
+            
+            const c22 = M1 - M2 + M3 + M6;
+            steps.push(`C22 = M1 - M2 + M3 + M6 = ${c22}`);
+            
+            return [[c11, c12], [c21, c22]];
+        }
+
+        function displayResults(algo, result, executionTime) {
+            const resultsContent = document.getElementById('resultsContent');
+            let html = '';
+
+            switch(algo) {
+                case 'mergeSort':
+                case 'quickSort':
+                case 'heapSort':
+                case 'insertionSort':
+                    html = `
+                        <div class="result-item">
+                            <h3>Input Array</h3>
+                            <div class="array-visual">
+                                ${result.input.map(n => `<span class="array-item">${n}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Sorted Array</h3>
+                            <div class="array-visual">
+                                ${result.output.map(n => `<span class="array-item">${n}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Execution Time</h3>
+                            <div class="result-value">${executionTime} milliseconds</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Operations Performed</h3>
+                            <div class="result-value">${operationCount} comparisons/operations</div>
+                        </div>
+                    `;
+                    break;
+
+                case 'binarySearch':
+                    html = `
+                        <div class="result-item">
+                            <h3>Search Result</h3>
+                            <div class="result-value">
+                                ${result.index !== -1 
+                                    ? `✓ Found ${result.target} at index ${result.index}` 
+                                    : `✗ ${result.target} not found in the array`}
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Execution Time</h3>
+                            <div class="result-value">${executionTime} milliseconds</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Operations Performed</h3>
+                            <div class="result-value">${operationCount} comparisons</div>
+                        </div>
+                    `;
+                    break;
+
+                case 'fastPower':
+                    html = `
+                        <div class="result-item">
+                            <h3>Result</h3>
+                            <div class="result-value">${result.base}<sup>${result.exponent}</sup> = ${result.result}</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Execution Time</h3>
+                            <div class="result-value">${executionTime} milliseconds</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Operations Performed</h3>
+                            <div class="result-value">${operationCount} multiplications</div>
+                        </div>
+                    `;
+                    break;
+
+                case 'minMax':
+                    html = `
+                        <div class="result-item">
+                            <h3>Minimum Value</h3>
+                            <div class="result-value">${result.min}</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Maximum Value</h3>
+                            <div class="result-value">${result.max}</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Execution Time</h3>
+                            <div class="result-value">${executionTime} milliseconds</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Operations Performed</h3>
+                            <div class="result-value">${operationCount} comparisons</div>
+                        </div>
+                    `;
+                    break;
+
+                case 'strassen':
+                    html = `
+                        <div class="result-item">
+                            <h3>Matrix A</h3>
+                            <div class="matrix-display">
+                                <div class="matrix-row">
+                                    <div class="matrix-cell">${result.matrixA[0][0]}</div>
+                                    <div class="matrix-cell">${result.matrixA[0][1]}</div>
+                                </div>
+                                <div class="matrix-row">
+                                    <div class="matrix-cell">${result.matrixA[1][0]}</div>
+                                    <div class="matrix-cell">${result.matrixA[1][1]}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Matrix B</h3>
+                            <div class="matrix-display">
+                                <div class="matrix-row">
+                                    <div class="matrix-cell">${result.matrixB[0][0]}</div>
+                                    <div class="matrix-cell">${result.matrixB[0][1]}</div>
+                                </div>
+                                <div class="matrix-row">
+                                    <div class="matrix-cell">${result.matrixB[1][0]}</div>
+                                    <div class="matrix-cell">${result.matrixB[1][1]}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Result Matrix (A × B)</h3>
+                            <div class="matrix-display">
+                                <div class="matrix-row">
+                                    <div class="matrix-cell highlight">${result.result[0][0]}</div>
+                                    <div class="matrix-cell highlight">${result.result[0][1]}</div>
+                                </div>
+                                <div class="matrix-row">
+                                    <div class="matrix-cell highlight">${result.result[1][0]}</div>
+                                    <div class="matrix-cell highlight">${result.result[1][1]}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Execution Time</h3>
+                            <div class="result-value">${executionTime} milliseconds</div>
+                        </div>
+                        <div class="result-item">
+                            <h3>Operations Performed</h3>
+                            <div class="result-value">${operationCount} multiplications (Strassen uses 7 instead of 8)</div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            resultsContent.innerHTML = html;
+            showResults();
+        }
+
+        function displayVisualization() {
+            const visualizationContent = document.getElementById('visualizationContent');
+            let html = '';
+            
+            steps.forEach((step, index) => {
+                html += `<div class="step">Step ${index + 1}: ${step}</div>`;
+            });
+            
+            visualizationContent.innerHTML = html;
+        }
+
+        function displayComplexity(algo) {
+            const complexityContent = document.getElementById('complexityContent');
+            const algoData = algorithms[algo];
+            
+            const html = `
+                <div class="complexity">
+                    <div class="complexity-item">
+                        <strong>Best Case</strong>
+                        <div>${algoData.timeComplexity.best}</div>
+                    </div>
+                    <div class="complexity-item">
+                        <strong>Average Case</strong>
+                        <div>${algoData.timeComplexity.average}</div>
+                    </div>
+                    <div class="complexity-item">
+                        <strong>Worst Case</strong>
+                        <div>${algoData.timeComplexity.worst}</div>
+                    </div>
+                    <div class="complexity-item">
+                        <strong>Space Complexity</strong>
+                        <div>${algoData.spaceComplexity}</div>
+                    </div>
+                </div>
+            `;
+            
+            complexityContent.innerHTML = html;
+        }
+
+        function showError(message) {
+            const resultsContent = document.getElementById('resultsContent');
+            resultsContent.innerHTML = `<div class="error">⚠️ Error: ${message}</div>`;
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('visualizationSection').style.display = 'none';
+            document.getElementById('complexitySection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
